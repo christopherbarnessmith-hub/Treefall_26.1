@@ -3,13 +3,13 @@
 	"id": "treefall",
 	"version": "${version}",
 	"name": "Treefall",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Chop the base of a tree with an axe and the whole thing comes down — logs drop instantly, leaves vanish, and you earn XP for every log felled. Sneak to bypass. Fully configurable.",
 	"authors": [
 		"KingxIon!"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://ionwiki.netlify.app/",
+		"sources": "https://github.com/christopherbarnessmith-hub/Treefall_26.1"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/treefall/icon.png",

@@ -26,9 +26,10 @@ public class TreefallConfig {
         Treefall.XP_PER_LOG      = parseInt(props,  "xp_per_log",      Treefall.XP_PER_LOG);
         Treefall.DURABILITY_COST = parseBool(props, "durability_cost",  Treefall.DURABILITY_COST);
         Treefall.SNEAK_BYPASS    = parseBool(props, "sneak_bypass",     Treefall.SNEAK_BYPASS);
+        Treefall.ALLOW_BUILT_LOGS = parseBool(props, "allow_built_logs", Treefall.ALLOW_BUILT_LOGS);
 
-        Treefall.LOGGER.info("Treefall config loaded: max_logs={}, xp_per_log={}, durability_cost={}, sneak_bypass={}",
-                Treefall.MAX_LOGS, Treefall.XP_PER_LOG, Treefall.DURABILITY_COST, Treefall.SNEAK_BYPASS);
+        Treefall.LOGGER.info("Treefall config loaded: max_logs={}, xp_per_log={}, durability_cost={}, sneak_bypass={}, allow_built_logs={}",
+                Treefall.MAX_LOGS, Treefall.XP_PER_LOG, Treefall.DURABILITY_COST, Treefall.SNEAK_BYPASS, Treefall.ALLOW_BUILT_LOGS);
     }
 
     private static void writeDefaults() {
@@ -52,6 +53,10 @@ public class TreefallConfig {
                 writer.println("# If true, sneaking while breaking a log skips felling and breaks");
                 writer.println("# only that single block normally. Useful for trimming trees.");
                 writer.println("sneak_bypass=true");
+                writer.println();
+                writer.println("# If true, connected player-built log structures can be felled too.");
+                writer.println("# Defaults false so log houses, bridges, and decorations do not chain-break.");
+                writer.println("allow_built_logs=false");
             }
         } catch (IOException e) {
             Treefall.LOGGER.warn("Could not write default treefall.properties: {}", e.getMessage());

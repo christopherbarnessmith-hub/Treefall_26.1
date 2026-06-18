@@ -8,6 +8,7 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ public class Treefall implements ModInitializer {
 	public static int     XP_PER_LOG       = 1;    // XP points awarded per log felled
 	public static boolean DURABILITY_COST  = true; // axe loses 1 durability per log broken
 	public static boolean SNEAK_BYPASS     = true; // sneak + break = single block, no felling
+	public static boolean ALLOW_BUILT_LOGS = false; // true lets connected log builds fell too
 
 	@Override
 	public void onInitialize() {
@@ -75,7 +78,7 @@ public class Treefall implements ModInitializer {
 				if (logsToBreak.size() >= MAX_LOGS) return; // abort — too large, probably artificial
 				logsToBreak.add(current);
 				for (BlockPos neighbor : getNeighbors(current)) {
-					if (!visited.contains(neighbor)) {
+					if (!visited.contains(neighbor) && shouldVisitLogNeighbor(world, current, neighbor)) {
 						visited.add(neighbor);
 						queue.add(neighbor);
 					}
@@ -94,8 +97,13 @@ public class Treefall implements ModInitializer {
 			}
 		}
 
+		if (!ALLOW_BUILT_LOGS && leavesToBreak.isEmpty()) {
+			return;
+		}
+
 		ServerLevel serverWorld = (ServerLevel) world;
 		int totalXp = 0;
+		Set<BlockPos> replantPositions = findReplantPositions(world, brokenPos, logsToBreak);
 
 		for (BlockPos logPos : logsToBreak) {
 			BlockState logState = world.getBlockState(logPos);
@@ -125,11 +133,80 @@ public class Treefall implements ModInitializer {
 					totalXp));
 		}
 
-		// Remove leaves instantly with no drops
+		// Remove leaves instantly, but still roll their normal drops
 		for (BlockPos leafPos : leavesToBreak) {
-			if (!world.getBlockState(leafPos).isAir()) {
+			BlockState leafState = world.getBlockState(leafPos);
+			if (!leafState.isAir()) {
+				List<ItemStack> drops = Block.getDrops(leafState, serverWorld, leafPos, null, null, ItemStack.EMPTY);
+				for (ItemStack drop : drops) {
+					world.addFreshEntity(new ItemEntity(world,
+							leafPos.getX() + 0.5, leafPos.getY() + 0.5, leafPos.getZ() + 0.5, drop));
+				}
 				world.setBlock(leafPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
 			}
+		}
+
+		plantSaplingsFromInventory(world, replantPositions, player);
+	}
+
+	private Set<BlockPos> findReplantPositions(Level world, BlockPos brokenPos, List<BlockPos> logsToBreak) {
+		Set<BlockPos> logPositions = new HashSet<>(logsToBreak);
+		Set<BlockPos> replantPositions = new LinkedHashSet<>();
+		replantPositions.add(brokenPos);
+
+		for (BlockPos logPos : logsToBreak) {
+			boolean isBottomLog = !logPositions.contains(logPos.below()) && !isLog(world.getBlockState(logPos.below()).getBlock());
+			boolean hasTrunkAbove = logPositions.contains(logPos.above());
+			if (isBottomLog && hasTrunkAbove) {
+				replantPositions.add(logPos);
+			}
+		}
+
+		return replantPositions;
+	}
+
+	private boolean shouldVisitLogNeighbor(Level world, BlockPos current, BlockPos neighbor) {
+		if (ALLOW_BUILT_LOGS) return true;
+
+		BlockState neighborState = world.getBlockState(neighbor);
+		if (!isLog(neighborState.getBlock())) return true;
+
+		return neighbor.getY() != current.getY() || hasNaturalLeafNearby(world, neighbor);
+	}
+
+	private boolean hasNaturalLeafNearby(Level world, BlockPos pos) {
+		int radius = 2;
+		for (BlockPos checkPos : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {
+			BlockState state = world.getBlockState(checkPos);
+			if (isLeaf(state.getBlock()) && !state.getValue(LeavesBlock.PERSISTENT)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void plantSaplingsFromInventory(Level world, Set<BlockPos> positions, Player player) {
+		for (BlockPos pos : positions) {
+			plantSaplingFromInventory(world, pos, player);
+		}
+	}
+
+	private void plantSaplingFromInventory(Level world, BlockPos pos, Player player) {
+		if (!world.getBlockState(pos).isAir()) return;
+
+		for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+			ItemStack stack = player.getInventory().getItem(slot);
+			if (!(stack.getItem() instanceof BlockItem blockItem)) continue;
+			if (!(blockItem.getBlock() instanceof SaplingBlock)) continue;
+
+			BlockState saplingState = blockItem.getBlock().defaultBlockState();
+			if (!saplingState.canSurvive(world, pos)) continue;
+
+			world.setBlock(pos, saplingState, Block.UPDATE_ALL);
+			if (!player.getAbilities().instabuild) {
+				stack.shrink(1);
+			}
+			return;
 		}
 	}
 

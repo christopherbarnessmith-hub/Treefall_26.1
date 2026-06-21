@@ -50,10 +50,10 @@ Changes take effect on the next server or world load.
 
 ## Requirements
 
-- Minecraft 26.1.2
+- Minecraft 26.2
 - Java 25 or newer
 - Ion Multiplatform API 0.1.0
-- Fabric Loader 0.19.2 and Fabric API, or NeoForge 26.1.2.76
+- Fabric Loader 0.19.2 and Fabric API, or NeoForge 26.2.0.6-beta
 
 ## Build
 

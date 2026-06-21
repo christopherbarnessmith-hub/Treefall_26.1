@@ -1,13 +1,38 @@
 pluginManagement {
-	repositories {
-		maven {
-			name = 'Fabric'
-			url = 'https://maven.fabricmc.net/'
-		}
-		mavenCentral()
-		gradlePluginPortal()
-	}
+    repositories {
+        maven {
+            name = "Fabric"
+            url = "https://maven.fabricmc.net/"
+        }
+        maven {
+            name = "NeoForge"
+            url = "https://maven.neoforged.net/releases"
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
 
-// Should match your modid
-rootProject.name = 'treefall'
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+    repositories {
+        mavenCentral()
+        maven {
+            name = "Fabric"
+            url = "https://maven.fabricmc.net/"
+        }
+        maven {
+            name = "NeoForge"
+            url = "https://maven.neoforged.net/releases"
+        }
+        maven {
+            name = "IonApi"
+            url = uri("C:/Modding/IonMultiplatformApi-scaffold/build/repo")
+        }
+    }
+}
+
+rootProject.name = "treefall"
+
+include("fabric")
+include("neoforge")

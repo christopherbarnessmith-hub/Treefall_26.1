@@ -1,6 +1,6 @@
 # Treefall
 
-Treefall is a Fabric mod that lets you chop the base of a tree with an axe and bring the whole tree down at once.
+Treefall is a Fabric and NeoForge mod that lets you chop the base of a tree with an axe and bring the whole tree down at once.
 
 When a valid tree is felled:
 
@@ -8,7 +8,7 @@ When a valid tree is felled:
 - Natural leaves are removed instantly.
 - Log drops are spawned normally, respecting the axe enchantments.
 - XP is awarded for the felled logs.
-- If the player has valid saplings in their inventory, saplings are replanted at the detected trunk bases.
+- If the player has valid saplings in their inventory, saplings are replanted at detected trunk bases.
 
 Sneaking while breaking a log can be used to bypass tree felling and break only the single block.
 
@@ -16,7 +16,7 @@ Sneaking while breaking a log can be used to bypass tree felling and break only 
 
 Treefall protects player-built log structures by default. Log houses, bridges, decorations, and other connected log builds should not chain-break when chopped.
 
-If you want the old behavior, where connected log builds can be felled too, enable it in the config:
+If you want connected log builds to be felled too, enable it in the config:
 
 ```properties
 allow_built_logs=true
@@ -39,19 +39,10 @@ config/treefall.properties
 Available options:
 
 ```properties
-# Maximum number of logs a tree can have before felling is aborted.
 max_logs=512
-
-# XP awarded per log when a tree is felled. Set to 0 to disable.
 xp_per_log=1
-
-# If true, the axe loses 1 durability per log broken during felling.
 durability_cost=true
-
-# If true, sneaking while breaking a log skips felling.
 sneak_bypass=true
-
-# If true, connected player-built log structures can be felled too.
 allow_built_logs=false
 ```
 
@@ -60,9 +51,32 @@ Changes take effect on the next server or world load.
 ## Requirements
 
 - Minecraft 26.1.2
-- Fabric Loader 0.19.2 or newer
-- Fabric API
 - Java 25 or newer
+- Ion Multiplatform API 0.1.0
+- Fabric Loader 0.19.2 and Fabric API, or NeoForge 26.1.2.76
+
+## Build
+
+Build both loader jars:
+
+```text
+gradlew build
+```
+
+The output jars are written to:
+
+```text
+fabric/build/libs
+neoforge/build/libs
+```
+
+## Project Layout
+
+```text
+common/   Shared Treefall logic and config.
+fabric/   Fabric entrypoint and metadata.
+neoforge/ NeoForge entrypoint and metadata.
+```
 
 ## License
 

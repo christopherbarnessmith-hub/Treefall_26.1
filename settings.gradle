@@ -25,10 +25,6 @@ dependencyResolutionManagement {
             name = "NeoForge"
             url = "https://maven.neoforged.net/releases"
         }
-        maven {
-            name = "IonApi"
-            url = uri("C:/Modding/IonMultiplatformApi-scaffold/build/repo")
-        }
     }
 }
 

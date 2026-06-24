@@ -2,13 +2,6 @@ plugins {
     id "net.neoforged.moddev" version "${moddevgradle_version}"
 }
 
-repositories {
-    maven {
-        name = "IonApi"
-        url = uri("C:/Modding/IonMultiplatformApi-scaffold/build/repo")
-    }
-}
-
 neoForge {
     version = neoforge_version
 
@@ -20,10 +13,6 @@ neoForge {
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(rootProject.java_version as int)
-
-dependencies {
-    implementation "com.ionapi:ionapi-neoforge:${ionapi_version}"
-}
 
 sourceSets.main.java.srcDir("../common/src/main/java")
 

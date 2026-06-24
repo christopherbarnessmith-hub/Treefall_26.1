@@ -1,6 +1,5 @@
 package com.kingxion.treefall;
 
-import com.ionapi.IonPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -47,7 +46,7 @@ public final class Treefall {
 
         initialized = true;
         TreefallConfig.load();
-        LOGGER.info("Treefall initialized on {}", IonPlatform.loaderName());
+        LOGGER.info("Treefall initialized");
     }
 
     public static void onBlockBroken(Level world, Player player, BlockPos pos, BlockState state) {
